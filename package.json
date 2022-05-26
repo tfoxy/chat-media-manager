@@ -1,0 +1,40 @@
+{
+  "name": "chat-media-manager",
+  "private": true,
+  "version": "0.0.0",
+  "author": "Tomás Fox",
+  "license": "GPL-3.0-only",
+  "homepage": "https://github.com/tfoxy/chat-media-manager#readme",
+  "main": "electron/electron.js",
+  "scripts": {
+    "dev": "vite",
+    "build": "vue-tsc --noEmit && vite build",
+    "preview": "vite preview",
+    "electron": "wait-on tcp:3000 && cross-env IS_DEV=true electron .",
+    "electron:pack": "electron-builder --dir",
+    "electron:dev": "concurrently -k \"cross-env BROWSER=none npm run dev\" \"npm run electron\"",
+    "electron:builder": "electron-builder",
+    "build:for:electron": "vue-tsc --noEmit && cross-env ELECTRON=true vite build",
+    "app:build": "npm run build:for:electron && npm run electron:builder"
+  },
+  "dependencies": {
+    "@types/wicg-file-system-access": "^2020.9.5",
+    "sql.js": "^1.6.2",
+    "vue": "^3.2.25"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.35",
+    "@types/sql.js": "^1.4.3",
+    "@vitejs/plugin-vue": "^2.3.3",
+    "concurrently": "^7.2.1",
+    "cross-env": "^7.0.3",
+    "electron": "^19.0.0",
+    "electron-builder": "^23.0.3",
+    "electron-reloader": "^1.2.3",
+    "typescript": "^4.5.4",
+    "vite": "^2.9.9",
+    "vite-tsconfig-paths": "^3.5.0",
+    "vue-tsc": "^0.34.7",
+    "wait-on": "^6.0.1"
+  }
+}

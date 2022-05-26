@@ -1,0 +1,14 @@
+appId: "io.github.tfoxy.chat-media-manager"
+productName: "chat-media-manager"
+copyright: "Copyright © 2022 Tomás Fox"
+mac:
+  category: "public.app-category.utilities"
+nsis:
+  oneClick: false,
+  allowToChangeInstallationDirectory: true
+files:
+  - "dist/**/*"
+  - "electron/**/*"
+directories:
+  buildResources: "assets"
+  output: "dist_electron"
