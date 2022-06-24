@@ -1,6 +1,5 @@
 import { BindParams, Database } from "sql.js";
-import { Contact, createDatabase, mediaWaType, MessageMedia } from "./sql";
-import { extractNumberFromJid } from "./utils";
+import { Contact, MessageMedia } from "./sql";
 
 function* query<T extends { [K in keyof T]: T[K] }>(
   db: Database,
@@ -17,30 +16,9 @@ function* query<T extends { [K in keyof T]: T[K] }>(
   }
 }
 
-function getSender(
-  media: MessageMedia,
-  contactMap: Map<string, Contact>,
-  me: string
-) {
-  if (media.key_from_me) {
-    return me;
-  }
-  const contactJid = media.remote_resource || media.key_remote_jid;
-  const contact = contactMap.get(contactJid);
-  return (
-    contact?.wa_name ??
-    contact?.given_name ??
-    contact?.number ??
-    extractNumberFromJid(contactJid)
-  );
-}
-
-export const readDatabase = async (file: File): Promise<Database> =>
-  createDatabase(new Uint8Array(await file.arrayBuffer()));
-
-export const queryAll = async (db: Database, stmt: string) => {
-  const rows = [];
-  for (const row of query(db, stmt)) {
+export const queryAll = <T>(db: Database, stmt: string): T[] => {
+  const rows: T[] = [];
+  for (const row of query<T>(db, stmt)) {
     rows.push(row);
   }
   return rows;
@@ -63,21 +41,18 @@ export function getContactMap(db: Database): Map<string, Contact> {
 /**
  * @param db from "msgstore.db" file
  */
-export function getMediaByGroup(
-  db: Database,
-  contactMap: Map<string, Contact>,
-  me: string
-): Map<string, MessageMedia[]> {
-  const mediaTypes = [
-    mediaWaType.VIDEO,
-    // mediaWaType.ANIMATED_GIF,
-  ];
-  const mediaListMap = new Map<string, MessageMedia[]>();
-  for (const media of query<MessageMedia>(
+export function getMediaList(db: Database): MessageMedia[] {
+  return queryAll<MessageMedia>(
     db,
     `
     SELECT
       message_media.file_path,
+      message_media.file_size,
+      message_media.file_length,
+      message_media.mime_type,
+      message_media.width,
+      message_media.height,
+      message_media.media_duration,
       messages.key_from_me,
       messages.timestamp,
       messages.media_caption,
@@ -88,20 +63,7 @@ export function getMediaByGroup(
     INNER JOIN messages
       ON message_media.message_row_id = messages._id
     WHERE message_media.file_path IS NOT NULL
-      AND messages.media_wa_type IN (${mediaTypes.map(() => "?")})
-      AND message_media.gif_attribution = 0
     ORDER BY messages.timestamp
-  `,
-    mediaTypes
-  )) {
-    media.sender = getSender(media, contactMap, me);
-    let mediaList = mediaListMap.get(media.key_remote_jid);
-    if (!mediaList) {
-      mediaList = [];
-      mediaListMap.set(media.key_remote_jid, mediaList);
-    }
-    mediaList.push(media);
-  }
-
-  return mediaListMap;
+  `
+  );
 }

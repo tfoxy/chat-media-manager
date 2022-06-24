@@ -1,11 +1,11 @@
 <script setup lang="ts">
-import ManagerView from "./components/ManagerView.vue";
+import MediaPreview from "./components/MediaPreview.vue";
 import { SettingsProvider } from "./hooks/useSettings";
 </script>
 
 <template>
   <SettingsProvider>
-    <ManagerView />
+    <MediaPreview />
   </SettingsProvider>
 </template>
 

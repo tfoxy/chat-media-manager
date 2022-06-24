@@ -31,7 +31,9 @@ export const mediaWaType = {
   SHARE_LOCATION: "16",
   STICKER: "20",
   PHOTO_ONCE: "42",
-};
+} as const;
+
+export type MediaWaType = typeof mediaWaType[keyof typeof mediaWaType];
 
 export interface Contact {
   jid: string;
@@ -43,11 +45,16 @@ export interface Contact {
 
 export interface MessageMedia {
   file_path: string;
-  key_from_me: string;
-  timestamp: string;
+  file_size: number;
+  file_length: number;
+  mime_type: string;
+  width: number;
+  height: number;
+  media_duration: number;
+  key_from_me: number;
+  timestamp: number;
   media_caption: string;
   remote_resource: string;
-  media_wa_type: string;
+  media_wa_type: MediaWaType;
   key_remote_jid: string;
-  sender: string;
 }

@@ -11,5 +11,4 @@ export default defineConfig({
       ? "/chat-media-manager/"
       : "",
   plugins: [tsconfigPaths(), vue()],
-  build: {},
 });
